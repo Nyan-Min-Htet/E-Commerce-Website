@@ -1,0 +1,87 @@
+.container1 {
+    width: 40%;
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto; /* Center align for responsiveness */
+}
+
+.signup_form {
+    padding-top: 40px;
+}
+
+.signup_form form {
+    width: 100%;
+}
+
+.signup_form .name,
+.signup_form .age,
+.signup_form .email,
+.signup_form .ad,
+.signup_form .psw {
+    width: 100%;
+    height: 35px;
+    padding: 6px 10px;
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+select {
+    width: 100%; /* Fixed width percentage for responsiveness */
+    height: 50px;
+    font-size: 15px;
+    letter-spacing: 1px;
+    padding: 6px 10px;
+    color: gray;
+}
+
+.signup_btn {
+    width: 100%; /* Adjusted for responsiveness */
+    max-width: 300px; /* Optional: limit button width */
+    height: 50px;
+    font-size: 17px;
+    border: none;
+    background-color: black;
+    color: white;
+    margin-top: 40px;
+    margin-left: auto;
+    margin-right: auto; /* Center align button */
+    display: block;
+}
+
+/* Media Query for Tablets (screen width up to 768px) */
+@media (max-width: 768px) {
+    .container1 {
+        width: 80%;
+    }
+
+    .signup_btn {
+        width: 70%;
+    }
+}
+
+/* Media Query for Mobile Devices (screen width up to 480px) */
+@media (max-width: 480px) {
+    .container1 {
+        width: 100%; /* Use full width for small screens */
+    }
+
+    .signup_form {
+        padding-top: 20px;
+    }
+
+    .signup_form .name,
+    .signup_form .age,
+    .signup_form .email,
+    .signup_form .ad,
+    .signup_form .psw {
+        height: 40px; /* Slightly larger for touch inputs */
+    }
+
+    .signup_btn {
+        width: 90%;
+    }
+
+    select {
+        width: 100%; /* Ensure dropdown fits screen width */
+    }
+}

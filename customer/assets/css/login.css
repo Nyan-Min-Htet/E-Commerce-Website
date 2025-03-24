@@ -1,0 +1,130 @@
+/* General Styles */
+.intro_text {
+    text-align: center;
+    letter-spacing: 3px;
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+.container1 {
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%; /* Adjusted for smaller screens */
+    margin-bottom: 50px;
+}
+h1 {
+    font-size: 2rem; /* Responsive font size */
+}
+.signup_text {
+    letter-spacing: 1px;
+    font-size: 16px;
+    color: gray;
+}
+.signup_text a {
+    text-decoration: none;
+    color: black;
+}
+.login_form {
+    padding-top: 40px;
+}
+.login_form form {
+    width: 100%;
+}
+.login_form .email, .psw {
+    width: 100%;
+    height: 35px;
+    padding: 6px 10px;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+.resetpsw_btn {
+    display: flex;
+    margin-bottom: 40px;
+    border: none;
+    background-color: white;
+    color: black;
+    letter-spacing: 1px;
+}
+.resetpsw_btn:hover {
+    color: red;
+}
+.resetpsw_an {
+    text-decoration: none;
+}
+.signin_btn {
+    width: 100%; /* Full width on smaller screens */
+    height: 50px;
+    font-size: 16px;
+    border: none;
+    background-color: black;
+    color: white;
+}
+
+/* Custom Alert */
+#customAlert {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    width: 90%; /* Adjusted for responsiveness */
+    text-align: center;
+}
+#customAlert h2 {
+    margin: 0;
+    padding-bottom: 20px;
+    padding-top: 15px;
+    font-size: 1.2rem; /* Responsive font size */
+}
+#customAlert p {
+    color: red;
+}
+#customAlert button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: aquamarine;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 50%; /* Full width on smaller screens */
+}
+
+/* Overlay */
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Media Queries */
+@media (min-width: 768px) {
+    .container1 {
+        width: 60%; /* Adjusted for tablets */
+    }
+    .signin_btn {
+        width: 50%; /* Default width for tablets and up */
+    }
+    h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container1 {
+        margin-left: 300px; /* Restore margin for larger screens */
+        width: 40%; /* Default width */
+    }
+    h1 {
+        font-size: 3rem;
+    }
+}
