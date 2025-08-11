@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/chatbot.css">
     <style>
     .feedback-container {
         text-align: center;
@@ -236,12 +237,30 @@
             <button type="submit" name="submit" class="sub_btn">SUBSCRIBE</button>
         </form>
     </div>
+    <div id="chatbot-container">
+        <button id="chatbot-toggle" aria-label="Toggle Chatbot">💬</button>
+        <div id="chatbox">
+            <div id="chatbox-header">
+                <h3>Chat Support</h3>
+                <p>Hi. My name is Sam. How can I help you?</p>
+            </div>
+            <div id="chatlog" tabindex="0"></div>
+            <div id="chatbox-footer">
+                <input type="text" id="user-input" placeholder="Ask me anything..." />
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
     <?php
         include("footer.php");
     ?>
+
     <button onclick="topFunction()" id="top" style="width: 6%;" title="Go to top">Top</button>
     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
     <script src="assets/js/index.js"></script>
+    <script src="assets/js/chatbot.js"></script>
+
 </body>
 
 </html>
