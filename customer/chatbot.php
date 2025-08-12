@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/libs/Parsedown.php';
 
 // Your OpenRouter API key (replace with your actual key)
-$apiKey = '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';
+$apiKey = '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';
 
 // Get the message from frontend POST
 $data = json_decode(file_get_contents('php://input'), true);
