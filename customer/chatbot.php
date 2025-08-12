@@ -7,27 +7,45 @@ error_reporting(E_ALL);
 // Include Parsedown for Markdown to HTML conversion
 require_once __DIR__ . '/libs/Parsedown.php';
 
-// Your OpenRouter API key
-$apiKey = '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';
+// Your OpenRouter API key (replace with your actual key)
+$apiKey = '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';
 
-// Optional meta info for OpenRouter rankings
-$siteUrl = 'http://localhost:3000/customer/index.php';
-$siteName = 'Yan Yan Floral House';
-
-// Get the message from the frontend
+// Get the message from frontend POST
 $data = json_decode(file_get_contents('php://input'), true);
-$userMessage = $data['message'] ?? '';
+$userMessage = trim($data['message'] ?? '');
 
 if (!$userMessage) {
-    echo json_encode(["reply" => "No message received."]);
+    echo json_encode(["reply" => "Please enter a question or message."]);
     exit;
 }
 
-// Build the payload
+// System prompt that sets the chatbot context
+$systemPrompt = <<<EOD
+You are a helpful assistant for Yan Yan Flower House, a floral shop.  
+The shop sells these flowers and plants:
+- FLOWER BULBS  
+- CLEMATIS & VINES  
+- ROSES  
+- FRUITS TREES & BUSHES  
+- TREES  
+Here my Price List:
+- FLOWER BULBS: 10500 MMK
+- CLEMATIS & VINES: 3500 MMK at least
+- ROSES: 101500 MMK at least
+- FRUITS TREES & BUSHES: 3500 MMK at least
+- TREES: 13500 MMK at least
+Delivery to downtown Yangon is 3,000 MMK and usually arrives within 2 hours after your order is confirmed.
+For orders placed before 4 PM, we offer same-day delivery within Yangon.
+We accept KBZPay, WavePay, and cash on delivery for all orders.
+Answer questions about products, prices, delivery, and contact information politely and clearly.  
+Use Markdown formatting for lists, tables, and emphasis where helpful.
+EOD;
+
+// Prepare payload for OpenRouter API
 $payload = [
     "model" => "deepseek/deepseek-r1:free",
     "messages" => [
-        ["role" => "system", "content" => "You are a friendly flower shop assistant. Answer questions about products, prices, delivery, and contact information. You can use Markdown formatting for tables, bold text, and bullet lists."],
+        ["role" => "system", "content" => $systemPrompt],
         ["role" => "user", "content" => $userMessage]
     ]
 ];
@@ -38,9 +56,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Content-Type: application/json',
-    'Authorization: Bearer ' . $apiKey,
-    'HTTP-Referer: ' . $siteUrl,
-    'X-Title: ' . $siteName
+    'Authorization: Bearer ' . $apiKey
 ]);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 
@@ -53,16 +69,13 @@ if (curl_errno($ch)) {
 
 curl_close($ch);
 
-// Save response for debugging
-file_put_contents("debug_response.json", $response);
-
+// Decode response
 $result = json_decode($response, true);
 $replyMarkdown = $result['choices'][0]['message']['content'] ?? "Sorry, I couldn't generate a response.";
 
 // Convert Markdown to HTML
 $Parsedown = new Parsedown();
-$Parsedown->setSafeMode(false); // Allow HTML
+$Parsedown->setSafeMode(false);
 $replyHtml = $Parsedown->text($replyMarkdown);
 
 echo json_encode(["reply" => $replyHtml]);
-?>

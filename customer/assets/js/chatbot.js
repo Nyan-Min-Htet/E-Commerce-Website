@@ -4,17 +4,18 @@ const chatbox = document.getElementById("chatbox");
 chatbox.style.display = "none";
 chatbox.classList.remove("open");
 
-// Toggle chatbot visibility and save state
+// Restore chatbox state from localStorage
+if (localStorage.getItem("chatboxOpen") === "true") {
+  chatbox.style.display = "flex";
+  chatbox.classList.add("open");
+}
+
+// Toggle chatbot visibility
 toggleBtn.onclick = () => {
-  if (chatbox.style.display === "none" || !chatbox.classList.contains("open")) {
-    chatbox.style.display = "flex";
-    chatbox.classList.add("open");
-    localStorage.setItem("chatboxOpen", "true");
-  } else {
-    chatbox.style.display = "none";
-    chatbox.classList.remove("open");
-    localStorage.setItem("chatboxOpen", "false");
-  }
+  const isOpen = chatbox.classList.contains("open");
+  chatbox.style.display = isOpen ? "none" : "flex";
+  chatbox.classList.toggle("open", !isOpen);
+  localStorage.setItem("chatboxOpen", !isOpen);
 };
 
 async function sendMessage() {
@@ -24,18 +25,16 @@ async function sendMessage() {
 
   const chatlog = document.getElementById("chatlog");
 
-  // Create user message element with animation
+  // Create user message
   const userMsgEl = document.createElement("div");
   userMsgEl.classList.add("user-msg");
   userMsgEl.textContent = `You: ${userMessage}`;
   chatlog.appendChild(userMsgEl);
-  inputField.value = ""; // Clear input field
   chatlog.scrollTop = chatlog.scrollHeight;
-  setTimeout(() => {
-    userMsgEl.classList.add("animate-in");
-  }, 10);
+  setTimeout(() => userMsgEl.classList.add("animate-in"), 10);
+  inputField.value = "";
 
-  // Add typing indicator
+  // Typing indicator
   const typingEl = document.createElement("div");
   typingEl.className = "bot-msg typing-indicator";
   typingEl.innerHTML = `<span></span><span></span><span></span>`;
@@ -50,40 +49,37 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-
-    // Remove typing indicator
     typingEl.remove();
 
-    if (data.error) {
-      const errorMsgEl = document.createElement("div");
-      errorMsgEl.className = "bot-msg";
-      errorMsgEl.textContent = `Bot: ${
-        data.error.message || "An error occurred."
-      }`;
-      chatlog.appendChild(errorMsgEl);
-      setTimeout(() => {
-        errorMsgEl.classList.add("animate-in");
-      }, 10);
-      chatlog.scrollTop = chatlog.scrollHeight;
-      return;
-    }
-
-    // Add bot message with HTML support
     const botMsgEl = document.createElement("div");
     botMsgEl.classList.add("bot-msg");
-    botMsgEl.innerHTML = `<strong>Bot:</strong> ${data.reply}`;
+
+    if (data.error) {
+      botMsgEl.textContent = `Bot: ${
+        data.error.message || "An error occurred."
+      }`;
+    } else {
+      botMsgEl.innerHTML = `<strong>Bot:</strong> ${data.reply}`;
+    }
+
     chatlog.appendChild(botMsgEl);
     chatlog.scrollTop = chatlog.scrollHeight;
-    setTimeout(() => {
-      botMsgEl.classList.add("animate-in");
-    }, 10);
+    setTimeout(() => botMsgEl.classList.add("animate-in"), 10);
   } catch (error) {
     typingEl.remove();
 
     const botErrorEl = document.createElement("div");
     botErrorEl.classList.add("bot-msg", "animate-in");
-    botErrorEl.textContent = "Bot: Something went wrong.";
+    botErrorEl.textContent = "Bot: Something went wrong. Please try again.";
     chatlog.appendChild(botErrorEl);
     chatlog.scrollTop = chatlog.scrollHeight;
   }
 }
+
+// Allow pressing Enter to send message
+document.getElementById("user-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
