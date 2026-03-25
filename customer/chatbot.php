@@ -7,19 +7,26 @@ error_reporting(E_ALL);
 // Include Parsedown for Markdown to HTML conversion
 require_once __DIR__ . '/libs/Parsedown.php';
 
-// Your OpenRouter API key (replace with your actual key)
-$apiKey = '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';
+// Your OpenRouter API key - store this in a config file or environment variable
+$apiKey = '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';
 
 // Get the message from frontend POST
-$data = json_decode(file_get_contents('php://input'), true);
-$userMessage = trim($data['message'] ?? '');
+$input = file_get_contents('php://input');
+$data = json_decode($input, true);
 
-if (!$userMessage) {
-    echo json_encode(["reply" => "Please enter a question or message."]);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    echo json_encode(["error" => true, "message" => "Invalid JSON input"]);
     exit;
 }
 
-// System prompt that sets the chatbot context
+$userMessage = trim($data['message'] ?? '');
+
+if (empty($userMessage)) {
+    echo json_encode(["error" => true, "message" => "Please enter a question or message."]);
+    exit;
+}
+
+// System prompt
 $systemPrompt = <<<EOD
 You are a helpful assistant for Yan Yan Flower House, a floral shop.  
 The shop sells these flowers and plants:
@@ -43,39 +50,69 @@ EOD;
 
 // Prepare payload for OpenRouter API
 $payload = [
-    "model" => "deepseek/deepseek-r1:free",
+    "model" => "openai/gpt-3.5-turbo", // Try a different model if this fails
     "messages" => [
         ["role" => "system", "content" => $systemPrompt],
         ["role" => "user", "content" => $userMessage]
-    ]
+    ],
+    "max_tokens" => 500
 ];
 
 // Call OpenRouter API
 $ch = curl_init("https://openrouter.ai/api/v1/chat/completions");
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'Authorization: Bearer ' . $apiKey
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $apiKey,
+        'HTTP-Referer: http://localhost', // Add this header
+        'X-Title: Yan Yan Flower House'   // Add this header
+    ],
+    CURLOPT_POSTFIELDS => json_encode($payload),
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_SSL_VERIFYPEER => false, // For testing only
+    CURLOPT_SSL_VERIFYHOST => 0      // For testing only
 ]);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 
 $response = curl_exec($ch);
 
 if (curl_errno($ch)) {
-    echo json_encode(["reply" => 'cURL error: ' . curl_error($ch)]);
+    $error_msg = curl_error($ch);
+    echo json_encode(["error" => true, "message" => "API connection failed: " . $error_msg]);
+    curl_close($ch);
     exit;
 }
 
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
+
+// Check HTTP status
+if ($httpCode !== 200) {
+    error_log("OpenRouter API returned HTTP $httpCode: " . $response);
+    echo json_encode(["error" => true, "message" => "API returned error code $httpCode"]);
+    exit;
+}
 
 // Decode response
 $result = json_decode($response, true);
-$replyMarkdown = $result['choices'][0]['message']['content'] ?? "Sorry, I couldn't generate a response.";
+
+if (!$result || !isset($result['choices'][0]['message']['content'])) {
+    error_log("Invalid API response structure: " . $response);
+    echo json_encode(["error" => true, "message" => "Invalid response from AI service"]);
+    exit;
+}
+
+$replyMarkdown = $result['choices'][0]['message']['content'];
 
 // Convert Markdown to HTML
 $Parsedown = new Parsedown();
-$Parsedown->setSafeMode(false);
+$Parsedown->setSafeMode(true); // Enable safe mode for security
 $replyHtml = $Parsedown->text($replyMarkdown);
 
-echo json_encode(["reply" => $replyHtml]);
+// Return only one JSON response
+echo json_encode([
+    "success" => true,
+    "reply" => $replyHtml
+]);
+exit;

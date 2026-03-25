@@ -54,25 +54,28 @@ async function sendMessage() {
     const botMsgEl = document.createElement("div");
     botMsgEl.classList.add("bot-msg");
 
-    if (data.error) {
-      botMsgEl.textContent = `Bot: ${
-        data.error.message || "An error occurred."
+    if (data.error || !data.success) {
+      botMsgEl.innerHTML = `<strong>Bot:</strong> ${
+        data.message || "An error occurred."
       }`;
+      console.error("API Error:", data);
     } else {
       botMsgEl.innerHTML = `<strong>Bot:</strong> ${data.reply}`;
     }
 
     chatlog.appendChild(botMsgEl);
     chatlog.scrollTop = chatlog.scrollHeight;
+
     setTimeout(() => botMsgEl.classList.add("animate-in"), 10);
   } catch (error) {
     typingEl.remove();
 
     const botErrorEl = document.createElement("div");
     botErrorEl.classList.add("bot-msg", "animate-in");
-    botErrorEl.textContent = "Bot: Something went wrong. Please try again.";
+    botErrorEl.innerHTML = `<strong>Bot:</strong> Network error: ${error.message}`;
     chatlog.appendChild(botErrorEl);
     chatlog.scrollTop = chatlog.scrollHeight;
+    console.error("Fetch Error:", error);
   }
 }
 
