@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/libs/Parsedown.php';
 
 // Your OpenRouter API key - store this in a config file or environment variable
-$apiKey = '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';
+$apiKey = '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';
 
 // Get the message from frontend POST
 $input = file_get_contents('php://input');
@@ -67,7 +67,7 @@ curl_setopt_array($ch, [
         'Content-Type: application/json',
         'Authorization: Bearer ' . $apiKey,
         'HTTP-Referer: http://localhost', // Add this header
-        'X-Title: Yan Yan Flower House'   // Add this header
+        'X-Title: Yan Yan Earth Floral House'   // Add this header
     ],
     CURLOPT_POSTFIELDS => json_encode($payload),
     CURLOPT_TIMEOUT => 30,
